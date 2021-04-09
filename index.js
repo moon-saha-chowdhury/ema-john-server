@@ -7,7 +7,7 @@ require('dotenv').config()
 const app = express()
 app.use(bodyParser.json());
 app.use(cors());
-const port = 5000
+const port = 5000;
 
 app.get('/', (req, res) => {
   res.send('Hello World! I am Here')
@@ -19,6 +19,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const productsCollection = client.db("emaJohnStore").collection("products");
+  const ordersCollection = client.db("emaJohnStore").collection("orders");
   // perform actions on the collection object
 //   console.log('database connected successfully');
 
@@ -58,6 +59,17 @@ app.post('/productByKeys',(req,res)=>{
   productsCollection.find({key:{$in:productKeys} })
   .toArray((err,documents)=>{
     res.send(documents);
+  })
+})
+
+
+//Insert shipment data in a new collection in db
+app.post('/addOrder',(req, res)=>{
+  const order = req.body;
+  ordersCollection.insertOne(order)
+  .then(result =>{
+      console.log(result.insertedCount);
+      res.send(result.insertedCount>0)
   })
 })
 
