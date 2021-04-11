@@ -34,9 +34,11 @@ client.connect(err => {
      })
  })
 
- //Loading data from database
+ //Loading data from database through search input
  app.get('/products',(req,res)=>{
-   productsCollection.find({}).limit(20)
+  //  productsCollection.find({}).limit(20) mane onk data theke 20 ta dao
+  const search = req.query.search;
+  productsCollection.find({name: {$regex:search}})
    .toArray((err,documents)=>{
      res.send(documents);
    })
